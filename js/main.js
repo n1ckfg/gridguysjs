@@ -7,6 +7,7 @@
 
 //---     MAIN CONTROLS     ---
 var firstRun = true;
+
 //if you want to avoid chain reactions, try 0, 20, 100, 0.2
 var delayCounter = 0;    // delays start of spread
 var lifeCounter = 20;    // how long spread lasts
@@ -22,85 +23,13 @@ var fps = 24;
 var lowQualityReduceBy = 5;
 var currentFrame = 0;
 var renderCounter = 0;
-var mapImg = new Array(numFrames); // PImage
-var scaleImg = new Array(numFrames); // PImage
+var mapImg = []; // PImage
+var scaleImg = []; // PImage
 var numColumns, numRows;
 var guyWidth, guyHeight, startX, startY;
 var bob = [];
 var setRules = "";
 var odds_X_Yplus1, odds_Xminus1_Y, odds_X_Yminus1, odds_Xplus1_Y, odds_Xplus1_Yplus1, odds_Xminus1_YminuX1, odds_Xplus1_Yminus1, odds_Xminus1_Yplus1;
-
-function preload() {
-    for (var i = 0; i < mapImg.length; i++) {
-        mapImg[i] = loadImage("./images/cellosback_" + (i + 1) + ".png");
-    }
-}
-
-function setup() {
-    fillBoxSetup();
-    initGlobals();
-    
-    //if (renderHighQuality) {
-        //size(sW, sH, P2D); // try an alternate renderer
-    //} else {
-        //size(sW, sH, P2D);
-    //}
-    
-    createCanvas(sW, sH);
-    //noCursor();
-    //frameRate(fps);
-
-    for (var y = 0; y < numRows; y++) {
-        for (var x = 0; x < numColumns; x++) {
-            rulesInit(x, y);
-            guysInit(x, y);
-        }
-    }
-    for (var i = 0; i < mapImg.length; i++) {
-        //mapImg[i] = loadImage("cellosback_" + (i + 1) + ".png"); // moved to preload()
-        scaleImg[i] = createImage(numColumns, numRows, RGB);
-    }
-    background(0);
-
-    firstRun = false;
-}
-
-
-function draw() {
-    //if (firstRun){
-        //fillBoxDraw();
-    //} else {
-	    //image(mapImg[currentFrame], 0, 0, numColumns, numRows);
-	    scaleImg[currentFrame] = mapImg[currentFrame].get(0, 0, numColumns, numRows);
-
-	    for (var y = 0; y < numRows; y++) {
-	        for (var x = 0; x < numColumns; x++) {
-	            var loc = x + (y * numColumns);
-	            if (scaleImg[currentFrame].pixels[loc] != color(0)) {
-	                bob[x][y].mainFire();
-	            }
-	            rulesHandler(x, y);
-	            bob[x][y].run();
-	        }
-	    }
-
-	    if (currentFrame < numFrames - 1) {
-	    	currentFrame++;
-	    }
-	    
-        /*
-        if (renderHighQuality) {
-		    if (renderCounter < renderCounterMax) {
-		        saveFrame("render/render####.png");
-		        console.log("rendered frame: " + (renderCounter+1) + " / " + renderCounterMax);
-		        renderCounter++;
-		    }else{
-		    	exit();
-		    }
-	    }
-        */
-    //}
-}
 
 function initGlobals() {
     //if (renderHighQuality) {
@@ -110,17 +39,26 @@ function initGlobals() {
     numColumns = sW / lowQualityReduceBy;
     numRows = sH / lowQualityReduceBy;
     //}
-    guyWidth = width / numColumns;
-    guyHeight = height / numRows;
-    bob = new Array(numColumns);
-    for (var i = 0; i < bob.length; i++) {
-        bob[i] = new Array(numRows);
-    }
+    guyWidth = sW / numColumns;
+    guyHeight = sH / numRows;
+
     startX = guyWidth / 2;
     startY = guyHeight / 2;
+    /*
+    bob = [];
+    for (var i = 0; i < numColumns; i++) {
+        var b = [];
+        for (var j = 0; j < numRows; j++) {
+            var g = new GridGuy(startX, startY, guyWidth, guyHeight, setRules, globalChaos, delayCounter, lifeCounter, respawnCounter);
+            b.push(g);
+        }
+        bob.push(b);
+    }
+    */
 }
 
 
+/*
 function keyPressed() {
     resetAll();
 }
@@ -214,7 +152,7 @@ function resetAll() {
         }
     }
 }
-
+*/
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 var buttonSize = 80;
@@ -223,16 +161,18 @@ var centerPointY = sH / 2;
 var doubleClickedGlobal = false;
 
 var numFillBoxButtons = 8;
-var fillBoxButtons = new Array(numFillBoxButtons);
+var fillBoxButtons = [];
 var goButton; // Button
-var randomValues = new Array(numFillBoxButtons);
+var randomValues = [];
 
 function fillBoxSetup() {
     goButton = new Button(sW/2, sH/2, buttonSize * 0.75, color(0, 200, 0), 16, "GO");
     
     for (var i = 0; i < numFillBoxButtons; i++) {
-        fillBoxButtons[i] = new FillBoxButton(0, 0, buttonSize, color(200, 100, 0), 18, "" + randomValues[i]);
-        randomValues[i] = 0;
+        var r = 0;
+        randomValues.push(r);
+        var f = new FillBoxButton(0, 0, buttonSize, color(200, 100, 0), 18, "0.0");
+        fillBoxButtons.push(f);
     }
 
     fillBoxButtons[0].posX = (sW / 2) - buttonSize;
@@ -254,15 +194,16 @@ function fillBoxSetup() {
 }
 
 function fillBoxDraw() {
-    goButton.update();
+    goButton.run();
     
     if (goButton.clicked) {
         firstRun = false;
     }
     
     for (var i = 0; i < numFillBoxButtons; i++) {
-        fillBoxButtons[i].update();
+        fillBoxButtons[i].run();
         randomValues[i] = fillBoxButtons[i].internalRandomValue;
+        console.log(fillBoxButtons[i].internalRandomValue);
     }
 
     odds_Xminus1_YminuX1 = randomValues[0]; // x-1 y-1
@@ -284,6 +225,83 @@ function mousePressed() {
 }
 */
 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+function preload() {
+    for (var i = 0; i < numFrames; i++) {
+        var img = loadImage("./images/cellosback_" + (i + 1) + ".png");
+        mapImg.push(img);
+    }
+}
+*/
+function setup() {
+    createCanvas(sW, sH);
+    fillBoxSetup();
+    initGlobals();
+    
+    //if (renderHighQuality) {
+        //size(sW, sH, P2D); // try an alternate renderer
+    //} else {
+        //size(sW, sH, P2D);
+    //}
+    
+    //noCursor();
+    //frameRate(fps);
+
+    /*
+    for (var y = 0; y < numRows; y++) {
+        for (var x = 0; x < numColumns; x++) {
+            rulesInit(x, y);
+            guysInit(x, y);
+        }
+    }
+    for (var i = 0; i < mapImg.length; i++) {
+        //mapImg[i] = loadImage("cellosback_" + (i + 1) + ".png"); // moved to preload()
+        scaleImg[i] = createImage(numColumns, numRows, RGB);
+    }
+    background(0);
+    */
+}
+
+
+function draw() {
+    background(0);
+    if (firstRun){
+        fillBoxDraw();
+    } else {
+        /*
+        //image(mapImg[currentFrame], 0, 0, numColumns, numRows);
+        scaleImg[currentFrame] = mapImg[currentFrame].get(0, 0, numColumns, numRows);
+
+        for (var y = 0; y < numRows; y++) {
+            for (var x = 0; x < numColumns; x++) {
+                var loc = x + (y * numColumns);
+                if (scaleImg[currentFrame].pixels[loc] != color(0)) {
+                    bob[x][y].mainFire();
+                }
+                rulesHandler(x, y);
+                bob[x][y].run();
+            }
+        }
+
+        if (currentFrame < numFrames - 1) {
+            currentFrame++;
+        }
+        */
+        
+        /*
+        if (renderHighQuality) {
+            if (renderCounter < renderCounterMax) {
+                saveFrame("render/render####.png");
+                console.log("rendered frame: " + (renderCounter+1) + " / " + renderCounterMax);
+                renderCounter++;
+            }else{
+                exit();
+            }
+        }
+        */
+    }
+}
 //}
 
 //window.onload = main;
