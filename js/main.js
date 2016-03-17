@@ -11,16 +11,16 @@ var firstRun = true;
 //if you want to avoid chain reactions, try 0, 20, 100, 0.2
 var delayCounter = 0;    // delays start of spread
 var lifeCounter = 20;    // how long spread lasts
-var respawnCounter = 100; // how long until retrigger
+var respawnCounter = 50; // how long until retrigger
 var globalChaos = 0.3;    // 0 = min, 1 = max
 //-------------------------
 var numFrames = 50;
 var renderCounterMax = 1000;
 //----
-var sW = 960;
-var sH = 540;
-var fps = 24;
-var lowQualityReduceBy = 5;
+var lowQualityReduceBy = 6; //5;
+var sW = 140 * lowQualityReduceBy;
+var sH = 42 * lowQualityReduceBy;
+var fps = 60; //24;
 var currentFrame = 0;
 var renderCounter = 0;
 var mapImg = new Array(numFrames); // PImage
@@ -222,11 +222,13 @@ function mousePressed() {
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+/*
 function preload() {
     for (var i = 0; i < mapImg.length; i++) {
         mapImg[i] = loadImage("./images/cellosback_" + (i + 1) + ".png");
     }
 }
+*/
 
 function setup() {
     createCanvas(sW, sH);
@@ -248,11 +250,14 @@ function setup() {
             guysInit(x, y);
         }
     }
+    
+    /*
     for (var i = 0; i < mapImg.length; i++) {
         //mapImg[i] = loadImage("cellosback_" + (i + 1) + ".png"); // moved to preload()
         scaleImg[i] = createImage(numColumns, numRows, RGB);
     }
-    background(0);
+    */
+    //background(0);
 }
 
 
@@ -262,22 +267,25 @@ function draw() {
         fillBoxDraw();
     } else {
         //image(mapImg[currentFrame], 0, 0, numColumns, numRows);
-        scaleImg[currentFrame] = mapImg[currentFrame].get(0, 0, numColumns, numRows);
+        //scaleImg[currentFrame] = mapImg[currentFrame].get(0, 0, numColumns, numRows);
 
         for (var y = 0; y < numRows; y++) {
             for (var x = 0; x < numColumns; x++) {
                 var loc = x + (y * numColumns);
-                if (scaleImg[currentFrame].pixels[loc] != color(0)) {
-                    mainGrid[x][y].mainFire();
-                }
+                //if (scaleImg[currentFrame].pixels[loc] != color(0)) {
+                //if (loc > 10000) {
+                    //mainGrid[x][y].mainFire();
+                //}
                 rulesHandler(x, y);
                 mainGrid[x][y].run();
             }
         }
 
+        /*
         if (currentFrame < numFrames - 1) {
             currentFrame++;
         }
+        */
         
         /*
         if (renderHighQuality) {
