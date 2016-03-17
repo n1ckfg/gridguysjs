@@ -23,11 +23,11 @@ var fps = 24;
 var lowQualityReduceBy = 5;
 var currentFrame = 0;
 var renderCounter = 0;
-var mapImg = []; // PImage
-var scaleImg = []; // PImage
+var mapImg = new Array(numFrames); // PImage
+var scaleImg = new Array(numFrames); // PImage
 var numColumns, numRows;
 var guyWidth, guyHeight, startX, startY;
-var bob = [];
+var mainGrid = [];
 var setRules = "";
 var odds_X_Yplus1, odds_Xminus1_Y, odds_X_Yminus1, odds_Xplus1_Y, odds_Xplus1_Yplus1, odds_Xminus1_YminuX1, odds_Xplus1_Yminus1, odds_Xminus1_Yplus1;
 
@@ -44,53 +44,50 @@ function initGlobals() {
 
     startX = guyWidth / 2;
     startY = guyHeight / 2;
-    /*
-    bob = [];
+
+    // make mainGrid a 2D array
     for (var i = 0; i < numColumns; i++) {
-        var b = [];
+        var mg = [];
         for (var j = 0; j < numRows; j++) {
             var g = new GridGuy(startX, startY, guyWidth, guyHeight, setRules, globalChaos, delayCounter, lifeCounter, respawnCounter);
-            b.push(g);
+            mg.push(g);
         }
-        bob.push(b);
+        mainGrid.push(mg);
     }
-    */
 }
 
-
-/*
 function keyPressed() {
     resetAll();
 }
 
 function rulesHandler(x, y) { // int x, int y
-    if (bob[x][y].switchArray[0]) {    // NWcorner
+    if (mainGrid[x][y].switchArray[0]) {    // NWcorner
     	//
-    } else if (bob[x][y].switchArray[1]) {    // NEcorner
+    } else if (mainGrid[x][y].switchArray[1]) {    // NEcorner
     	//
-    } else if (bob[x][y].switchArray[2]) {    // SWcorner
+    } else if (mainGrid[x][y].switchArray[2]) {    // SWcorner
     	//
-    } else if (bob[x][y].switchArray[3]) {     // SEcorner
+    } else if (mainGrid[x][y].switchArray[3]) {     // SEcorner
     	//
-    } else if (bob[x][y].switchArray[4]) {    //Nrow
+    } else if (mainGrid[x][y].switchArray[4]) {    //Nrow
     	//
-    } else if (bob[x][y].switchArray[5]) {    //Srow
+    } else if (mainGrid[x][y].switchArray[5]) {    //Srow
     	//
-    } else if (bob[x][y].switchArray[6]) {    //Wrow
+    } else if (mainGrid[x][y].switchArray[6]) {    //Wrow
     	//
-    } else if (bob[x][y].switchArray[7]) {    //Erow
+    } else if (mainGrid[x][y].switchArray[7]) {    //Erow
     	//
     } else { // everything else
-        if (bob[x][y].clicked) {
+        if (mainGrid[x][y].clicked) {
             //these are direction probabilities
-            bob[x][y + 1].kaboom = diceHandler(1, odds_X_Yplus1);
-            bob[x - 1][y].kaboom = diceHandler(1, odds_Xminus1_Y);
-            bob[x][y - 1].kaboom = diceHandler(1, odds_X_Yminus1);
-            bob[x + 1][y].kaboom = diceHandler(1, odds_Xplus1_Y);
-            bob[x + 1][y + 1].kaboom = diceHandler(1, odds_Xplus1_Yplus1);
-            bob[x - 1][y - 1].kaboom = diceHandler(1, odds_Xminus1_YminuX1);
-            bob[x + 1][y - 1].kaboom = diceHandler(1, odds_Xplus1_Yminus1);
-            bob[x - 1][y + 1].kaboom = diceHandler(1, odds_Xminus1_Yplus1);
+            mainGrid[x][y + 1].kaboom = diceHandler(1, odds_X_Yplus1);
+            mainGrid[x - 1][y].kaboom = diceHandler(1, odds_Xminus1_Y);
+            mainGrid[x][y - 1].kaboom = diceHandler(1, odds_X_Yminus1);
+            mainGrid[x + 1][y].kaboom = diceHandler(1, odds_Xplus1_Y);
+            mainGrid[x + 1][y + 1].kaboom = diceHandler(1, odds_Xplus1_Yplus1);
+            mainGrid[x - 1][y - 1].kaboom = diceHandler(1, odds_Xminus1_YminuX1);
+            mainGrid[x + 1][y - 1].kaboom = diceHandler(1, odds_Xplus1_Yminus1);
+            mainGrid[x - 1][y + 1].kaboom = diceHandler(1, odds_Xminus1_Yplus1);
         }
     }
 }
@@ -126,7 +123,7 @@ function rulesInit(x, y) { // int x, int y
 }
 
 function guysInit(x, y) { // int x, int y
-    bob[x][y] = new GridGuy(startX, startY, guyWidth, guyHeight, setRules, globalChaos, delayCounter, lifeCounter, respawnCounter);
+    mainGrid[x][y] = new GridGuy(startX, startY, guyWidth, guyHeight, setRules, globalChaos, delayCounter, lifeCounter, respawnCounter);
     if (startX < width - guyWidth) {
         startX += guyWidth;
     } else {
@@ -142,17 +139,17 @@ function resetAll() {
     currentFrame = 0;
     for (var y = 0; y < numRows; y++) {
         for (var x = 0; x < numColumns; x++) {
-            bob[x][y].hovered = false;
-            bob[x][y].clicked = false;
-            bob[x][y].kaboom = false;
-            bob[x][y].delayCountDown = bob[x][y].delayCountDownOrig;
-            bob[x][y].lifeCountDown = bob[x][y].lifeCountDownOrig;
-            bob[x][y].respawnCountDown = bob[x][y].respawnCountDownOrig;
-            bob[x][y].fillColor = bob[x][y].fillColorOrig;
+            mainGrid[x][y].hovered = false;
+            mainGrid[x][y].clicked = false;
+            mainGrid[x][y].kaboom = false;
+            mainGrid[x][y].delayCountDown = mainGrid[x][y].delayCountDownOrig;
+            mainGrid[x][y].lifeCountDown = mainGrid[x][y].lifeCountDownOrig;
+            mainGrid[x][y].respawnCountDown = mainGrid[x][y].respawnCountDownOrig;
+            mainGrid[x][y].fillColor = mainGrid[x][y].fillColorOrig;
         }
     }
 }
-*/
+
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 var buttonSize = 80;
@@ -161,18 +158,16 @@ var centerPointY = sH / 2;
 var doubleClickedGlobal = false;
 
 var numFillBoxButtons = 8;
-var fillBoxButtons = [];
+var fillBoxButtons = new Array(numFillBoxButtons);
 var goButton; // Button
-var randomValues = [];
+var randomValues = new Array(numFillBoxButtons);
 
 function fillBoxSetup() {
     goButton = new Button(sW/2, sH/2, buttonSize * 0.75, color(0, 200, 0), 16, "GO");
     
-    for (var i = 0; i < numFillBoxButtons; i++) {
-        var r = 0;
-        randomValues.push(r);
-        var f = new FillBoxButton(0, 0, buttonSize, color(200, 100, 0), 18, "0.0");
-        fillBoxButtons.push(f);
+    for (var i = 0; i < fillBoxButtons.length; i++) {
+        randomValues[i] = 0;
+        fillBoxButtons[i] = new FillBoxButton(0, 0, buttonSize, color(200, 100, 0), 18, "0.0");
     }
 
     fillBoxButtons[0].posX = (sW / 2) - buttonSize;
@@ -226,14 +221,13 @@ function mousePressed() {
 */
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-/*
+
 function preload() {
-    for (var i = 0; i < numFrames; i++) {
-        var img = loadImage("./images/cellosback_" + (i + 1) + ".png");
-        mapImg.push(img);
+    for (var i = 0; i < mapImg.length; i++) {
+        mapImg[i] = loadImage("./images/cellosback_" + (i + 1) + ".png");
     }
 }
-*/
+
 function setup() {
     createCanvas(sW, sH);
     fillBoxSetup();
@@ -248,7 +242,6 @@ function setup() {
     //noCursor();
     //frameRate(fps);
 
-    /*
     for (var y = 0; y < numRows; y++) {
         for (var x = 0; x < numColumns; x++) {
             rulesInit(x, y);
@@ -260,7 +253,6 @@ function setup() {
         scaleImg[i] = createImage(numColumns, numRows, RGB);
     }
     background(0);
-    */
 }
 
 
@@ -269,7 +261,6 @@ function draw() {
     if (firstRun){
         fillBoxDraw();
     } else {
-        /*
         //image(mapImg[currentFrame], 0, 0, numColumns, numRows);
         scaleImg[currentFrame] = mapImg[currentFrame].get(0, 0, numColumns, numRows);
 
@@ -277,17 +268,16 @@ function draw() {
             for (var x = 0; x < numColumns; x++) {
                 var loc = x + (y * numColumns);
                 if (scaleImg[currentFrame].pixels[loc] != color(0)) {
-                    bob[x][y].mainFire();
+                    mainGrid[x][y].mainFire();
                 }
                 rulesHandler(x, y);
-                bob[x][y].run();
+                mainGrid[x][y].run();
             }
         }
 
         if (currentFrame < numFrames - 1) {
             currentFrame++;
         }
-        */
         
         /*
         if (renderHighQuality) {
