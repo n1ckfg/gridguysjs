@@ -1,5 +1,5 @@
-GridGuys
-Copyright (c) 2011 Nick Fox-Gieg
+GridGuys: gridguysjs
+Copyright (c) 2016 Nick Fox-Gieg
 https://fox-gieg.com
 
 All rights reserved.
