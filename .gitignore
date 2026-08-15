@@ -1,0 +1,10 @@
+.DS_Store
+*.pyc
+__pycache__/
+node_modules/
+Library/
+Temp/
+.vscode/
+.vs/
+venv/
+.venv/
